@@ -1,0 +1,164 @@
+/* FIFA 2026 Interactive Fan Hub - Elegant Dark Theme */
+@import "tailwindcss";
+
+:root {
+  --neon-green: #00FF66;
+  --stadium-blue: #0A192F;
+  --navy-dark: #071224;
+  --border-blue: #1A2E44;
+  --gold: #D4AF37;
+  --gold-light: #F4D068;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--stadium-blue);
+  color: #FFFFFF;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar for Feeds & Page */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--navy-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-blue);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-green);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Glow Utilities */
+.glow-green {
+  box-shadow: 0 0 25px rgba(0, 255, 102, 0.25);
+}
+.glow-green-sm {
+  box-shadow: 0 0 12px rgba(0, 255, 102, 0.2);
+}
+.glow-gold {
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
+}
+.text-glow-green {
+  text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+}
+
+/* Animations */
+@keyframes pulseNeon {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatReward {
+  0% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-50px) rotate(15deg); opacity: 0; }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.pulse-neon {
+  animation: pulseNeon 2s infinite ease-in-out;
+}
+
+/* Canvas Styling */
+.game-canvas-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  border: 3px solid var(--border-blue);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  background: #071224;
+}
+
+.game-canvas-container:hover {
+  border-color: var(--neon-green);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 8 / 5;
+  cursor: pointer;
+  touch-action: none;
+  background: radial-gradient(circle at center, #132e50 0%, #071224 100%);
+}
+
+/* Toast Notifications */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  background: var(--navy-dark);
+  border: 1px solid var(--neon-green);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 255, 102, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideIn 0.3s ease forwards;
+}
+
+/* Responsive Fallbacks */
+.view-section {
+  display: none;
+  animation: slideIn 0.3s ease forwards;
+}
+.view-section.active {
+  display: block;
+}
+
+/* Radial background cards */
+.hero-gradient {
+  background: radial-gradient(circle at top right, #112c52 0%, #071224 70%);
+}
+
+.feed-header-gradient {
+  background: linear-gradient(90deg, #071224 0%, #0f2a4a 100%);
+}

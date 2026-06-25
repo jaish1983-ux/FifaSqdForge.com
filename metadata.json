@@ -1,0 +1,6 @@
+{
+  "name": "FIFA 2026 Interactive Fan Hub",
+  "description": "FIFA 2026 World Cup Fan Hub featuring live match updates simulation, interactive contender voting, countdown clock, and playable Penalty Shootout and Keepy-Uppy mini-games.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

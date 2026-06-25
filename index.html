@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en" class="dark h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FIFA 2026 Interactive Fan Hub • Official World Cup Portal</title>
+    <!-- Tailwind CSS v4 Browser SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Inter & Space Grotesk Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:ital,wght@0,700;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="bg-[#040b16] text-slate-100 font-sans min-h-full flex flex-col antialiased selection:bg-[#00FF66] selection:text-black">
+    
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-3 pointer-events-none"></div>
+
+    <!-- Top Sticky Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-[#071224]/90 backdrop-blur-md border-b border-[#1A2E44] shadow-2xl">
+      <nav class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+        
+        <!-- Brand Logo & Trophy -->
+        <div class="flex items-center space-x-3 cursor-pointer group" data-view="home">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-[#00FF66] to-[#0A192F] p-[2px] shadow-[0_0_20px_rgba(0,255,102,0.4)] group-hover:scale-105 transition-transform">
+            <div class="w-full h-full bg-[#071224] rounded-[14px] flex items-center justify-center text-xl sm:text-2xl">
+              ⚽
+            </div>
+          </div>
+          <div>
+            <span class="font-black italic tracking-tighter text-lg sm:text-2xl uppercase block leading-none text-white">
+              FIFA <span class="text-[#00FF66] drop-shadow-[0_0_10px_rgba(0,255,102,0.8)]">2026</span>
+            </span>
+            <span class="text-[10px] text-[#D4AF37] font-black uppercase tracking-widest flex items-center gap-1 mt-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-ping"></span>
+              Official Fan Hub • Zero Start
+            </span>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="flex items-center space-x-1 sm:space-x-4 font-bold text-xs sm:text-sm uppercase tracking-wider">
+          <button data-view="home" class="nav-btn px-3 py-2 rounded-xl text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/40 shadow-[0_0_15px_rgba(0,255,102,0.2)] transition-all">
+            🏆 Home / Vote
+          </button>
+          <button data-view="updates" class="nav-btn px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-[#1A2E44]/50 transition-all">
+            ⚡ Live Updates
+          </button>
+          <button data-view="games" class="nav-btn px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-[#1A2E44]/50 transition-all">
+            🎮 4 Arcade Games
+          </button>
+        </div>
+
+        <!-- Master Reset & Tokens Status -->
+        <div class="flex items-center space-x-3">
+          <!-- Master Reset Button -->
+          <button id="masterNavResetBtn" class="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 bg-red-600/15 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/40 rounded-full text-xs font-black uppercase transition-all shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+            <span>⚠️ Reset All To Zero</span>
+          </button>
+
+          <!-- Reward Token Balance -->
+          <div class="flex items-center space-x-2 bg-[#1A2E44] px-3.5 py-1.5 rounded-full border border-[#D4AF37]/50 shadow-inner">
+            <span class="text-base animate-bounce">🪙</span>
+            <span id="userTokenDisplay" class="font-mono text-sm font-black text-[#D4AF37]">0 PTS</span>
+          </div>
+
+          <!-- Tournament Countdown -->
+          <div class="hidden lg:flex items-center space-x-3 bg-[#0A192F] px-4 py-1.5 rounded-full border border-[#1A2E44]">
+            <span class="text-[11px] text-[#D4AF37] font-black tracking-wider flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse"></span>
+              KICKOFF
+            </span>
+            <span id="navCountdown" class="font-mono text-base font-bold text-white tracking-tight">--:--:--:--</span>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Subheader Mobile Reset Bar -->
+    <div class="sm:hidden bg-[#0a192f] py-2 px-4 border-b border-[#1A2E44] flex justify-between items-center text-xs">
+      <span class="text-gray-400 font-bold">Need clean slate?</span>
+      <button id="masterMobileResetBtn" class="text-red-400 font-black underline">⚠️ Reset All Data to Zero</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-[1440px] w-full mx-auto p-4 sm:p-6 lg:p-8">
+      
+      <!-- ==========================================
+           VIEW 1: HOME & INTERACTIVE VOTING HUB
+           ========================================== -->
+      <section id="view-home" class="view-section space-y-8 animate-slide-in">
+        
+        <!-- YESTERDAY'S MATCH RESULTS BANNER CARD (MANDATE) -->
+        <div class="bg-gradient-to-r from-[#0a192f] via-[#0d264a] to-[#0a192f] p-5 rounded-3xl border border-[#00FF66]/40 shadow-[0_0_30px_rgba(0,255,102,0.15)] relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-[#00FF66]/15 border border-[#00FF66]/40 flex items-center justify-center text-2xl animate-pulse">
+              ⏱️
+            </div>
+            <div>
+              <span class="text-[10px] font-black tracking-widest uppercase text-[#00FF66] bg-[#00FF66]/10 px-2 py-0.5 rounded border border-[#00FF66]/30">
+                Official FIFA Match Recap • Verified Real Results
+              </span>
+              <h2 class="text-lg sm:text-xl font-black italic uppercase text-white tracking-tight mt-1">
+                Yesterday's Match Results • Road to FIFA 2026
+              </h2>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-4 items-center w-full md:w-auto justify-center">
+            <!-- Recap Score 1 -->
+            <div class="bg-[#040b16] px-4 py-2 rounded-2xl border border-slate-700 flex items-center gap-3 text-sm font-bold">
+              <span>🇦🇷 Argentina</span>
+              <span class="font-mono text-[#00FF66] font-black px-2 py-0.5 bg-black rounded">2 - 1</span>
+              <span>🇨🇦 Canada</span>
+            </div>
+            <!-- Recap Score 2 -->
+            <div class="bg-[#040b16] px-4 py-2 rounded-2xl border border-slate-700 flex items-center gap-3 text-sm font-bold">
+              <span>🇺🇸 USA</span>
+              <span class="font-mono text-[#00FF66] font-black px-2 py-0.5 bg-black rounded">3 - 0</span>
+              <span>🇲🇽 Mexico</span>
+            </div>
+            <button data-view="updates" class="nav-btn px-3.5 py-2 bg-[#D4AF37] hover:bg-white text-black font-black uppercase text-xs rounded-xl transition-all whitespace-nowrap shadow-md">
+              Full Reports →
+            </button>
+          </div>
+        </div>
+
+        <!-- 12-Column Bento Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- LEFT 3 COLS: Live Match Simulation Preview -->
+          <div class="lg:col-span-3 flex flex-col space-y-4">
+            <div class="bg-[#071224] rounded-3xl border border-[#1A2E44] flex flex-col overflow-hidden shadow-2xl h-[650px]">
+              <div class="p-4 border-b border-[#1A2E44] feed-header-gradient flex justify-between items-center">
+                <div>
+                  <h2 class="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-[#00FF66] animate-ping"></span>
+                    Match & Injury News
+                  </h2>
+                  <p class="text-white font-bold text-sm">Live Real World Feed</p>
+                </div>
+                <button id="viewAllUpdatesBtn" class="text-xs text-[#00FF66] hover:underline font-bold">View All →</button>
+              </div>
+
+              <!-- Scrolling Simulation Feed Preview -->
+              <div id="homeSimFeed" class="flex-1 p-4 space-y-3.5 overflow-y-auto custom-scrollbar">
+                <!-- Injected dynamically by app.js -->
+              </div>
+
+              <div class="p-3 bg-[#0A192F] border-t border-[#1A2E44] flex justify-between items-center text-[11px] text-gray-400">
+                <span>Simulating Real-Time</span>
+                <button id="toggleSimBtn" class="text-[#00FF66] font-bold hover:text-white transition-colors">⏸️ Pause Feed</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CENTER 6 COLS: Interactive Contender Voting Module -->
+          <div class="lg:col-span-6 flex flex-col space-y-6">
+            <div class="bg-[#071224] rounded-3xl p-6 sm:p-8 border border-[#1A2E44] hero-gradient shadow-2xl relative overflow-hidden">
+              <div class="absolute -right-10 -top-10 w-40 h-40 bg-[#00FF66]/10 rounded-full blur-3xl pointer-events-none"></div>
+              
+              <div class="text-center mb-8">
+                <span class="inline-block px-3 py-1 bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#D4AF37] rounded-full text-[11px] font-black uppercase tracking-widest mb-3 shadow">
+                  🌐 Global Fan Poll • Zero Mandate
+                </span>
+                <h1 class="text-3xl sm:text-5xl font-black italic uppercase tracking-tighter mb-2 text-white">
+                  Who Will Win <span class="text-[#00FF66] drop-shadow-[0_0_20px_rgba(0,255,102,0.6)]">FIFA 2026?</span>
+                </h1>
+                <p class="text-gray-300 text-sm max-w-lg mx-auto">
+                  Click any top contender below to cast your live vote. Votes persist instantly. Reset to zero verified.
+                </p>
+              </div>
+
+              <!-- Voting Grid -->
+              <div id="votingGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Contender Team Cards injected here -->
+              </div>
+
+              <!-- Vote Footer Summary -->
+              <div class="mt-8 pt-6 border-t border-[#1A2E44] flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-400">
+                <div class="flex items-center gap-2">
+                  <span class="text-white font-bold">📊 Total Global Votes Cast:</span>
+                  <span id="totalVotesCount" class="font-mono font-black text-[#00FF66] text-base">0</span>
+                </div>
+                <div class="flex gap-3">
+                  <button id="shareRankingsBtn" class="px-3.5 py-2 bg-[#1A2E44] hover:bg-[#00FF66] hover:text-black text-white font-bold rounded-xl transition-all flex items-center gap-1.5 shadow">
+                    📤 Share Poll
+                  </button>
+                  <button id="resetVotesBtn" class="px-3.5 py-2 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 border border-red-500/30 font-bold rounded-xl transition-all shadow">
+                    🔄 Reset My Vote
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Host Stadium Highlights Card -->
+            <div class="bg-[#071224] p-6 rounded-3xl border border-[#1A2E44] flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
+              <div class="flex items-center gap-4">
+                <div class="text-3xl p-3 bg-[#0A192F] rounded-2xl border border-slate-700">🏟️</div>
+                <div>
+                  <h3 class="font-black uppercase text-white tracking-wide">48 Teams • 16 Host Cities • 104 Matches</h3>
+                  <p class="text-xs text-gray-400 mt-0.5">USA, Canada & Mexico hosting the biggest World Cup in history.</p>
+                </div>
+              </div>
+              <button data-view="updates" class="nav-btn px-4 py-2.5 bg-[#1A2E44] hover:bg-[#00FF66] hover:text-black font-black uppercase text-xs rounded-xl transition-all whitespace-nowrap shadow">
+                Explore Fixtures →
+              </button>
+            </div>
+          </div>
+
+          <!-- RIGHT 3 COLS: 4 Mini-Games Suite & Rewards -->
+          <div class="lg:col-span-3 flex flex-col space-y-4">
+            <div class="p-4 bg-[#0a192f] rounded-2xl border border-[#00FF66]/30 text-center">
+              <span class="text-xs text-[#00FF66] font-black uppercase tracking-widest block">🎮 4 Addictive Mini-Games</span>
+              <p class="text-[11px] text-gray-300 mt-1">Expanded suite to prevent boredom! Collect fan tokens.</p>
+            </div>
+            
+            <!-- Game 1 Launcher -->
+            <div class="bg-[#071224] rounded-2xl border border-[#1A2E44] hover:border-[#00FF66] p-5 flex flex-col items-center text-center space-y-3 transition-all shadow-xl group">
+              <div class="w-12 h-12 rounded-xl bg-[#00FF66]/10 border border-[#00FF66]/30 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">⚽</div>
+              <div>
+                <h3 class="font-black text-base text-white group-hover:text-[#00FF66] transition-colors">Penalty Shootout</h3>
+                <p class="text-[11px] text-gray-400">Bypass the moving goalie!</p>
+              </div>
+              <div class="w-full bg-[#0A192F] py-1.5 px-3 rounded-lg border border-[#1A2E44] flex justify-between items-center text-xs">
+                <span class="text-gray-400">High Score:</span>
+                <span id="launcherPenaltyScore" class="text-[#00FF66] font-mono font-black">0 GOALS</span>
+              </div>
+              <button data-view="games" data-game="penalty" class="nav-btn-game w-full py-2.5 bg-[#00FF66] hover:bg-white text-black rounded-xl text-xs font-black uppercase italic tracking-wider transition-colors shadow">Play Penalty</button>
+            </div>
+
+            <!-- Game 2 Launcher -->
+            <div class="bg-[#071224] rounded-2xl border border-[#1A2E44] hover:border-[#D4AF37] p-5 flex flex-col items-center text-center space-y-3 transition-all shadow-xl group">
+              <div class="w-12 h-12 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🤹</div>
+              <div>
+                <h3 class="font-black text-base text-white group-hover:text-[#D4AF37] transition-colors">Keepy-Uppy Pro</h3>
+                <p class="text-[11px] text-gray-400">Don't let the ball drop!</p>
+              </div>
+              <div class="w-full bg-[#0A192F] py-1.5 px-3 rounded-lg border border-[#1A2E44] flex justify-between items-center text-xs">
+                <span class="text-gray-400">Best Streak:</span>
+                <span id="launcherKeepyScore" class="text-[#D4AF37] font-mono font-black">0 KICKS</span>
+              </div>
+              <button data-view="games" data-game="keepy" class="nav-btn-game w-full py-2.5 bg-[#D4AF37] hover:bg-white text-black rounded-xl text-xs font-black uppercase italic tracking-wider transition-colors shadow">Start Keepy</button>
+            </div>
+
+            <!-- Game 3 Launcher (NEW) -->
+            <div class="bg-[#071224] rounded-2xl border border-[#1A2E44] hover:border-blue-400 p-5 flex flex-col items-center text-center space-y-3 transition-all shadow-xl group">
+              <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-400/30 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🧤</div>
+              <div>
+                <h3 class="font-black text-base text-white group-hover:text-blue-400 transition-colors">Goalie Reflex Gloves</h3>
+                <p class="text-[11px] text-gray-400">Save flying balls at 60fps!</p>
+              </div>
+              <div class="w-full bg-[#0A192F] py-1.5 px-3 rounded-lg border border-[#1A2E44] flex justify-between items-center text-xs">
+                <span class="text-gray-400">Best Saves:</span>
+                <span id="launcherGoalieScore" class="text-blue-400 font-mono font-black">0 SAVES</span>
+              </div>
+              <button data-view="games" data-game="goalie" class="nav-btn-game w-full py-2.5 bg-blue-500 hover:bg-white text-white hover:text-black rounded-xl text-xs font-black uppercase italic tracking-wider transition-colors shadow">Save Balls</button>
+            </div>
+
+            <!-- Game 4 Launcher (NEW) -->
+            <div class="bg-[#071224] rounded-2xl border border-[#1A2E44] hover:border-orange-400 p-5 flex flex-col items-center text-center space-y-3 transition-all shadow-xl group">
+              <div class="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-400/30 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🎯</div>
+              <div>
+                <h3 class="font-black text-base text-white group-hover:text-orange-400 transition-colors">Crossbar Bullseye Dart</h3>
+                <p class="text-[11px] text-gray-400">Lock reticle on Top Bins!</p>
+              </div>
+              <div class="w-full bg-[#0A192F] py-1.5 px-3 rounded-lg border border-[#1A2E44] flex justify-between items-center text-xs">
+                <span class="text-gray-400">Best Dart:</span>
+                <span id="launcherCrossbarScore" class="text-orange-400 font-mono font-black">0 PTS</span>
+              </div>
+              <button data-view="games" data-game="crossbar" class="nav-btn-game w-full py-2.5 bg-orange-500 hover:bg-white text-white hover:text-black rounded-xl text-xs font-black uppercase italic tracking-wider transition-colors shadow">Aim & Shoot</button>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 2: LIVE MATCH & INJURY NEWS CENTRE
+           ========================================== -->
+      <section id="view-updates" class="view-section hidden space-y-6 animate-slide-in">
+        
+        <!-- YESTERDAY'S MATCH RESULTS RECAP BANNER IN UPDATES FEED -->
+        <div class="bg-[#071224] p-6 rounded-3xl border border-[#00FF66]/30 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">🏁</span>
+            <div>
+              <h3 class="font-black uppercase text-white tracking-wide">Yesterday's Official Match Results</h3>
+              <p class="text-xs text-[#00FF66] font-mono mt-0.5">Verified Final Scores: Argentina 2-1 Canada | USA 3-0 Mexico | Brazil 4-0 Colombia</p>
+            </div>
+          </div>
+          <span class="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-bold rounded-full border border-green-500/30">Official FIFA Reports</span>
+        </div>
+
+        <!-- View Header -->
+        <div class="bg-[#071224] rounded-3xl p-6 sm:p-8 border border-[#1A2E44] feed-header-gradient flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-2xl">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+              <span class="text-xs font-black uppercase tracking-widest text-red-400">Live Simulation Engine Active</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-black italic uppercase tracking-tight text-white">
+              Match, Injury & News <span class="text-[#00FF66]">Centre</span>
+            </h1>
+            <p class="text-gray-300 text-sm mt-1">Real-time simulated commentary, goals, cards, and World Cup breaking injury bulletins.</p>
+          </div>
+
+          <!-- Simulation Controls -->
+          <div class="flex flex-wrap gap-2 items-center bg-[#0A192F] p-2 rounded-2xl border border-[#1A2E44]">
+            <span class="text-xs font-bold text-gray-400 px-2">Sim Speed:</span>
+            <button data-speed="3000" class="sim-speed-btn px-2.5 py-1 bg-[#00FF66] text-black font-bold text-xs rounded-lg transition-all">Normal (3s)</button>
+            <button data-speed="1500" class="sim-speed-btn px-2.5 py-1 bg-[#1A2E44] text-gray-300 hover:text-white font-bold text-xs rounded-lg transition-all">Fast (1.5s)</button>
+            <button data-speed="600" class="sim-speed-btn px-2.5 py-1 bg-[#1A2E44] text-gray-300 hover:text-white font-bold text-xs rounded-lg transition-all">Hyper (0.6s)</button>
+            <div class="w-[1px] h-6 bg-[#1A2E44] mx-1"></div>
+            <button id="triggerRandomEventBtn" class="px-3 py-1 bg-gradient-to-r from-yellow-500 to-red-600 text-white font-black text-xs rounded-lg hover:brightness-110 shadow-md">
+              ⚡ Trigger Event
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Live Feed Stream (Left 2 Columns) -->
+          <div class="lg:col-span-2 bg-[#071224] rounded-3xl border border-[#1A2E44] p-6 flex flex-col h-[750px] shadow-2xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-[#1A2E44] mb-4">
+              <h2 class="font-black uppercase tracking-wider text-lg text-white flex items-center gap-2">
+                📡 Live Real FIFA Stream
+              </h2>
+              
+              <!-- Category Filter (MANDATE INJURY ADDED) -->
+              <div class="flex gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+                <button data-filter="all" class="feed-filter active px-3 py-1 bg-[#00FF66]/20 text-[#00FF66] border border-[#00FF66]/40 text-xs font-bold rounded-lg transition-all">All</button>
+                <button data-filter="goal" class="feed-filter px-3 py-1 bg-[#1A2E44] text-gray-400 hover:text-white text-xs font-bold rounded-lg transition-all">⚽ Goals</button>
+                <button data-filter="injury" class="feed-filter px-3 py-1 bg-[#1A2E44] text-gray-400 hover:text-white text-xs font-bold rounded-lg transition-all">🏥 Injury News</button>
+                <button data-filter="news" class="feed-filter px-3 py-1 bg-[#1A2E44] text-gray-400 hover:text-white text-xs font-bold rounded-lg transition-all">📰 FIFA News</button>
+                <button data-filter="card" class="feed-filter px-3 py-1 bg-[#1A2E44] text-gray-400 hover:text-white text-xs font-bold rounded-lg transition-all">🟨 Cards</button>
+              </div>
+            </div>
+
+            <!-- Scrollable Feed Area -->
+            <div id="fullLiveFeed" class="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+              <!-- Dynamically populated -->
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-[#1A2E44] flex justify-between items-center text-xs text-gray-400">
+              <span id="feedStatusLabel">🟢 Verified Real News & Injury Updates</span>
+              <button id="clearFeedBtn" class="text-red-400 hover:underline font-bold">Clear History</button>
+            </div>
+          </div>
+
+          <!-- Tournament Fixtures & Stats (Right Column) -->
+          <div class="lg:col-span-1 space-y-6">
+            
+            <!-- Tournament Fixtures Table -->
+            <div class="bg-[#071224] rounded-3xl border border-[#1A2E44] p-6 space-y-4 shadow-xl">
+              <h3 class="font-black uppercase text-sm text-[#D4AF37] tracking-widest border-b border-[#1A2E44] pb-3">
+                🗓️ Key Fixture Schedule
+              </h3>
+              
+              <div class="space-y-3.5 text-xs">
+                <div class="bg-[#0A192F] p-3.5 rounded-xl border border-[#1A2E44] flex justify-between items-center">
+                  <div>
+                    <span class="text-[10px] text-[#00FF66] font-bold uppercase">Opening Match • June 11</span>
+                    <p class="font-bold text-white text-sm mt-0.5">🇲🇽 Mexico vs. TBA</p>
+                  </div>
+                  <span class="text-gray-400 text-[11px] font-mono">Estadio Azteca</span>
+                </div>
+
+                <div class="bg-[#0A192F] p-3.5 rounded-xl border border-[#1A2E44] flex justify-between items-center">
+                  <div>
+                    <span class="text-[10px] text-blue-400 font-bold uppercase">USA Opener • June 12</span>
+                    <p class="font-bold text-white text-sm mt-0.5">🇺🇸 USA vs. TBA</p>
+                  </div>
+                  <span class="text-gray-400 text-[11px] font-mono">SoFi Stadium</span>
+                </div>
+
+                <div class="bg-[#0A192F] p-3.5 rounded-xl border border-[#1A2E44] flex justify-between items-center">
+                  <div>
+                    <span class="text-[10px] text-red-400 font-bold uppercase">Canada Opener • June 12</span>
+                    <p class="font-bold text-white text-sm mt-0.5">🇨🇦 Canada vs. TBA</p>
+                  </div>
+                  <span class="text-gray-400 text-[11px] font-mono">BMO Field</span>
+                </div>
+
+                <div class="bg-[#0A192F] p-3.5 rounded-xl border border-[#D4AF37]/40 flex justify-between items-center">
+                  <div>
+                    <span class="text-[10px] text-[#D4AF37] font-bold uppercase">World Cup Final • July 19</span>
+                    <p class="font-black text-white text-sm mt-0.5">🏆 Grand Final Match</p>
+                  </div>
+                  <span class="text-[#D4AF37] text-[11px] font-mono">New Jersey</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fan Poll Quick Card -->
+            <div class="bg-[#0A192F] rounded-3xl border border-[#00FF66]/30 p-6 text-center space-y-3 shadow-xl">
+              <span class="text-3xl">🗳️</span>
+              <h3 class="font-black uppercase text-white">Have your say!</h3>
+              <p class="text-xs text-gray-300">Head back to the home tab to vote on who takes home the trophy.</p>
+              <button data-view="home" class="nav-btn w-full py-2.5 bg-[#00FF66] text-black font-black uppercase text-xs rounded-xl hover:bg-white transition-all shadow">
+                Vote Now
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==========================================
+           VIEW 3: BROWSER MINI-GAMES SUITE (4 GAMES)
+           ========================================== -->
+      <section id="view-games" class="view-section hidden space-y-8 animate-slide-in">
+        
+        <!-- Arena Hero Banner -->
+        <div class="bg-[#071224] rounded-3xl p-6 sm:p-8 border border-[#1A2E44] text-center relative overflow-hidden shadow-2xl">
+          <div class="absolute inset-0 bg-gradient-to-r from-[#00FF66]/10 via-transparent to-[#D4AF37]/10 pointer-events-none"></div>
+          
+          <span class="inline-block px-3 py-1 bg-[#00FF66]/15 border border-[#00FF66]/40 text-[#00FF66] rounded-full text-[11px] font-black uppercase tracking-widest mb-3 shadow">
+            🕹️ HTML5 Canvas Arcade Suite (4 Games Suite)
+          </span>
+          <h1 class="text-3xl sm:text-5xl font-black italic uppercase tracking-tight text-white mb-2">
+            FIFA 2026 Fan <span class="text-[#00FF66]">Arcade Suite</span>
+          </h1>
+          <p class="text-gray-300 text-sm max-w-xl mx-auto mb-6">
+            Expanded 4 mini-games suite to prevent boredom! Smooth 60fps physics, zero latency. Earn reward tokens & reset high scores!
+          </p>
+
+          <!-- Game Selection Tabs (4 GAMES) -->
+          <div class="inline-flex flex-wrap p-1.5 bg-[#0A192F] rounded-2xl border border-[#1A2E44] gap-2 justify-center">
+            <button data-selectgame="penalty" class="game-tab-btn active px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm uppercase italic tracking-wider bg-[#00FF66] text-black transition-all shadow-md">
+              ⚽ Penalty Shootout
+            </button>
+            <button data-selectgame="keepy" class="game-tab-btn px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm uppercase italic tracking-wider text-gray-400 hover:text-white transition-all">
+              🤹 Keepy-Uppy Pro
+            </button>
+            <button data-selectgame="goalie" class="game-tab-btn px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm uppercase italic tracking-wider text-gray-400 hover:text-white transition-all">
+              🧤 Goalie Reflex Gloves
+            </button>
+            <button data-selectgame="crossbar" class="game-tab-btn px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm uppercase italic tracking-wider text-gray-400 hover:text-white transition-all">
+              🎯 Crossbar Bullseye Dart
+            </button>
+          </div>
+        </div>
+
+        <!-- GAME 1: PENALTY SHOOTOUT WRAPPER -->
+        <div id="game-penalty-wrapper" class="space-y-6">
+          <div class="max-w-[800px] mx-auto bg-[#071224] p-4 rounded-2xl border border-[#1A2E44] flex flex-wrap justify-between items-center gap-4 text-sm font-bold shadow-xl">
+            <div class="flex items-center gap-2 text-[#00FF66]">
+              <span>SCORE:</span>
+              <span id="penaltyScoreDisplay" class="font-mono text-2xl font-black">0</span>
+            </div>
+            <div class="flex items-center gap-2 text-gray-300">
+              <span>SHOTS:</span>
+              <span id="penaltyShotsDisplay" class="font-mono text-lg">0</span>
+            </div>
+            <div class="flex items-center gap-2 text-[#D4AF37]">
+              <span>HIGH SCORE:</span>
+              <span id="penaltyHighDisplay" class="font-mono text-xl font-black">0</span>
+            </div>
+            <button id="resetPenaltyBtn" class="px-3.5 py-2 bg-[#1A2E44] hover:bg-red-500 hover:text-white text-xs rounded-xl transition-all font-bold shadow">
+              🔄 Reset Game
+            </button>
+          </div>
+
+          <div class="game-canvas-container shadow-2xl">
+            <canvas id="penaltyCanvas" width="800" height="500"></canvas>
+            <div id="penaltyOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-xs pointer-events-none opacity-0 transition-opacity duration-200">
+              <h2 id="penaltyOverlayText" class="text-5xl sm:text-7xl font-black italic uppercase tracking-tighter text-[#00FF66]">GOAL!</h2>
+              <p id="penaltyOverlaySubtext" class="text-white text-base font-bold mt-2">+5 Reward Tokens Earned!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- GAME 2: KEEPY-UPPY WRAPPER -->
+        <div id="game-keepy-wrapper" class="hidden space-y-6">
+          <div class="max-w-[800px] mx-auto bg-[#071224] p-4 rounded-2xl border border-[#1A2E44] flex flex-wrap justify-between items-center gap-4 text-sm font-bold shadow-xl">
+            <div class="flex items-center gap-2 text-[#D4AF37]">
+              <span>STREAK:</span>
+              <span id="keepyStreakDisplay" class="font-mono text-2xl font-black">0</span>
+            </div>
+            <div class="flex items-center gap-2 text-gray-300">
+              <span>GRAVITY:</span>
+              <span class="font-mono text-sm uppercase">60fps Pro</span>
+            </div>
+            <div class="flex items-center gap-2 text-[#00FF66]">
+              <span>HIGH STREAK:</span>
+              <span id="keepyHighDisplay" class="font-mono text-xl font-black">0</span>
+            </div>
+            <button id="resetKeepyBtn" class="px-3.5 py-2 bg-[#1A2E44] hover:bg-red-500 hover:text-white text-xs rounded-xl transition-all font-bold shadow">
+              🔄 Drop Ball
+            </button>
+          </div>
+
+          <div class="game-canvas-container border-[#D4AF37] shadow-2xl">
+            <canvas id="keepyCanvas" width="800" height="500"></canvas>
+            <div id="keepyOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-xs pointer-events-none opacity-0 transition-opacity duration-200">
+              <h2 id="keepyOverlayText" class="text-5xl sm:text-7xl font-black italic uppercase tracking-tighter text-red-500">DROPPED!</h2>
+              <p id="keepyOverlaySubtext" class="text-white text-base font-bold mt-2">Tap canvas to restart</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- GAME 3: GOALIE GLOVE REFLEX WRAPPER (NEW) -->
+        <div id="game-goalie-wrapper" class="hidden space-y-6">
+          <div class="max-w-[800px] mx-auto bg-[#071224] p-4 rounded-2xl border border-[#1A2E44] flex flex-wrap justify-between items-center gap-4 text-sm font-bold shadow-xl">
+            <div class="flex items-center gap-2 text-blue-400">
+              <span>SAVES:</span>
+              <span id="goalieSavesDisplay" class="font-mono text-2xl font-black">0</span>
+            </div>
+            <div class="flex items-center gap-2 text-red-400">
+              <span>CONCEDED:</span>
+              <span id="goalieConcededDisplay" class="font-mono text-lg font-black">0</span> / 3
+            </div>
+            <div class="flex items-center gap-2 text-[#00FF66]">
+              <span>BEST SAVES:</span>
+              <span id="goalieHighDisplay" class="font-mono text-xl font-black">0</span>
+            </div>
+            <button id="resetGoalieBtn" class="px-3.5 py-2 bg-[#1A2E44] hover:bg-red-500 hover:text-white text-xs rounded-xl transition-all font-bold shadow">
+              🔄 Restart Match
+            </button>
+          </div>
+
+          <div class="game-canvas-container border-blue-400 shadow-2xl">
+            <canvas id="goalieCanvas" width="800" height="500"></canvas>
+            <div id="goalieOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-xs pointer-events-none opacity-0 transition-opacity duration-200">
+              <h2 id="goalieOverlayText" class="text-5xl sm:text-7xl font-black italic uppercase tracking-tighter text-red-500">GAME OVER</h2>
+              <p id="goalieOverlaySubtext" class="text-white text-base font-bold mt-2">Tap canvas to defend net again</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- GAME 4: CROSSBAR BULLSEYE DART WRAPPER (NEW) -->
+        <div id="game-crossbar-wrapper" class="hidden space-y-6">
+          <div class="max-w-[800px] mx-auto bg-[#071224] p-4 rounded-2xl border border-[#1A2E44] flex flex-wrap justify-between items-center gap-4 text-sm font-bold shadow-xl">
+            <div class="flex items-center gap-2 text-orange-400">
+              <span>BULLSEYE SCORE:</span>
+              <span id="crossbarScoreDisplay" class="font-mono text-2xl font-black">0 PTS</span>
+            </div>
+            <div class="flex items-center gap-2 text-gray-300">
+              <span>DARTS REMAINING:</span>
+              <span id="crossbarShotsDisplay" class="font-mono text-lg font-black text-yellow-400">5</span>
+            </div>
+            <div class="flex items-center gap-2 text-[#D4AF37]">
+              <span>RECORD:</span>
+              <span id="crossbarHighDisplay" class="font-mono text-xl font-black">0</span>
+            </div>
+            <button id="resetCrossbarBtn" class="px-3.5 py-2 bg-[#1A2E44] hover:bg-red-500 hover:text-white text-xs rounded-xl transition-all font-bold shadow">
+              🔄 New Round
+            </button>
+          </div>
+
+          <div class="game-canvas-container border-orange-400 shadow-2xl">
+            <canvas id="crossbarCanvas" width="800" height="500"></canvas>
+            <div id="crossbarOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-xs pointer-events-none opacity-0 transition-opacity duration-200">
+              <h2 id="crossbarOverlayText" class="text-5xl sm:text-7xl font-black italic uppercase tracking-tighter text-[#D4AF37]">FINISHED!</h2>
+              <p id="crossbarOverlaySubtext" class="text-white text-base font-bold mt-2">Tap canvas to reload 5 darts</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arena Rewards Breakdown -->
+        <div class="max-w-[800px] mx-auto bg-[#071224] p-6 rounded-3xl border border-[#1A2E44] grid grid-cols-1 sm:grid-cols-4 gap-4 text-center shadow-xl">
+          <div class="p-4 bg-[#0A192F] rounded-2xl border border-[#1A2E44]">
+            <div class="text-2xl mb-1">⚽</div>
+            <h4 class="font-black text-xs uppercase text-[#00FF66]">Penalty Game</h4>
+            <p class="text-[11px] text-gray-400 mt-1">+5 PTS per goal scored</p>
+          </div>
+          <div class="p-4 bg-[#0A192F] rounded-2xl border border-[#1A2E44]">
+            <div class="text-2xl mb-1">🤹</div>
+            <h4 class="font-black text-xs uppercase text-[#D4AF37]">Keepy-Uppy</h4>
+            <p class="text-[11px] text-gray-400 mt-1">+5 PTS per 10 bounces</p>
+          </div>
+          <div class="p-4 bg-[#0A192F] rounded-2xl border border-[#1A2E44]">
+            <div class="text-2xl mb-1">🧤</div>
+            <h4 class="font-black text-xs uppercase text-blue-400">Goalie Reflex</h4>
+            <p class="text-[11px] text-gray-400 mt-1">+5 PTS per 5 saves</p>
+          </div>
+          <div class="p-4 bg-[#0A192F] rounded-2xl border border-[#1A2E44]">
+            <div class="text-2xl mb-1">🎯</div>
+            <h4 class="font-black text-xs uppercase text-orange-400">Crossbar Dart</h4>
+            <p class="text-[11px] text-gray-400 mt-1">+10 PTS per Top Bin hit</p>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#071224] border-t border-[#1A2E44] py-8 text-center text-xs text-gray-500 mt-auto">
+      <div class="max-w-[1440px] mx-auto px-4 space-y-3">
+        <p class="font-bold text-gray-400">🏆 FIFA 2026 OFFICIAL INTERACTIVE FAN HUB • ROAD TO NORTH AMERICA</p>
+        <p>Verified Real Match Commentary & Official Injury Bulletins • All Votes & High Scores Reset to Zero Mandate Applied</p>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="games.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
